@@ -1,0 +1,87 @@
+{% extends "reseller_layout.html" %}
+
+{% block title %}{{ t('reseller_add_title') }} - {{ t('reseller_panel') }}{% endblock %}
+{% block page_title %}{{ t('reseller_add_title') }}{% endblock %}
+{% block page_subtitle %}{{ t('reseller_add_subtitle') }}{% endblock %}
+
+{% block content %}
+<div class="card glass animate-fade" style="max-width: 600px; margin: 0 auto;">
+    <div class="card-title">
+        <span></span>
+        {{ t('reseller_add_license_details') }}
+    </div>
+
+    {% if error %}
+    <div class="alert alert-danger animate-fade" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; padding: 1rem; border-radius: 10px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fas fa-exclamation-circle"></i>
+        <span>{{ error }}</span>
+    </div>
+    {% endif %}
+
+    {% if success %}
+    <div class="alert alert-success animate-fade" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; padding: 1rem; border-radius: 10px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fas fa-check-circle"></i>
+        <span>{{ success }}</span>
+    </div>
+    {% endif %}
+
+    <form action="/reseller_add_user" method="post">
+        <div class="form-group">
+            <label><i class="fas fa-user-tag"></i> {{ t('reseller_add_username') }}</label>
+            <input type="text" name="username" class="input-field" placeholder="{{ t('reseller_add_username') }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label><i class="fas fa-key"></i> {{ t('reseller_add_license_key') }}</label>
+            <input type="text" name="key" class="input-field" placeholder="SIZAN112233" required>
+            <div style="margin-top: 0.3rem; font-size: 0.8rem; color: var(--text-muted);">{{ t('reseller_add_key_format') }}</div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+                <label><i class="fas fa-calendar-day"></i> {{ t('reseller_add_validity_days') }}</label>
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <button type="button" class="btn glass" style="padding: 5px 12px; font-size: 0.8rem;" onclick="setDays(1)">1D</button>
+                    <button type="button" class="btn glass" style="padding: 5px 12px; font-size: 0.8rem;" onclick="setDays(7)">7D</button>
+                    <button type="button" class="btn glass" style="padding: 5px 12px; font-size: 0.8rem;" onclick="setDays(30)">30D</button>
+                </div>
+                <input type="number" id="input_days" name="days" class="input-field" value="30" min="1">
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-clock"></i> {{ t('reseller_add_valid_time') }}</label>
+                <input type="number" name="hours" class="input-field" value="0" min="0" max="23">
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+                <label><i class="fas fa-calendar-alt"></i> {{ t('reseller_add_custom_expire') }}</label>
+                <input type="datetime-local" name="custom_expire" class="input-field">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-code-branch"></i> {{ t('reseller_add_game_version') }}</label>
+                <select name="version" class="input-field">
+                    <option value="v1">{{ t('version_standard') }}</option>
+                    <option value="v2">{{ t('version_premium') }}</option>
+                    <option value="x64">{{ t('version_beta') }}</option>
+                </select>
+            </div>
+        </div>
+
+        <script>
+            function setDays(d) {
+                document.getElementById('input_days').value = d;
+                document.getElementsByName('hours')[0].value = 0;
+                document.getElementsByName('custom_expire')[0].value = "";
+            }
+        </script>
+
+        <div style="margin-top: 2rem;">
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                <i class="fas fa-cloud-upload-alt"></i> {{ t('reseller_add_button') }}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

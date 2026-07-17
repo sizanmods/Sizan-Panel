@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="{{ lang }}">
+<head>
+    <meta charset="utf-8">
+    <title>{{ t('reseller_panel') }} - {{ t('panel_name') }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/logo.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .reseller-sidebar { background: linear-gradient(180deg, rgba(236,72,153,0.05), rgba(139,92,246,0.05)); border-right: 1px solid rgba(236,72,153,0.1); }
+        .lang-row { display: flex; gap: 0.3rem; }
+        .lang-btn { padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: var(--text-muted); text-decoration: none; transition: all 0.3s; }
+        .lang-btn:hover { border-color: #ec4899; color: #ec4899; }
+        .lang-btn.active { background: #ec4899; color: #fff; border-color: #ec4899; }
+        .search-bar { display: flex; gap: 0.5rem; align-items: center; margin-bottom: 1.5rem; }
+        .search-bar input { padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: #fff; font-size: 0.9rem; flex: 1; }
+        .search-bar input:focus { outline: none; border-color: #ec4899; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar glass reseller-sidebar">
+            <div class="logo">
+                <i class="fas fa-handshake"></i>
+                <span>{{ t('reseller_panel') }}</span>
+            </div>
+            <nav class="nav-links">
+                <a href="/reseller/dashboard" class="nav-item active">
+                    <i class="fas fa-chart-line"></i>
+                    <span>{{ t('nav_dashboard') }}</span>
+                </a>
+            </nav>
+            <div style="margin-top: auto;">
+                <hr style="opacity: 0.1; margin-bottom: 1rem;">
+                <div class="lang-row" style="justify-content: center; margin-bottom: 0.5rem;">
+                    {% for code, name in LANGUAGES.items() %}
+                    <a href="/lang/{{ code }}" class="lang-btn {% if lang == code %}active{% endif %}">{{ name }}</a>
+                    {% endfor %}
+                </div>
+                <p style="font-size: 0.75rem; color: var(--text-muted); text-align: center;" id="sidebarClock">{{ now }}</p>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header style="margin-bottom: 2.5rem; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1 style="font-size: 2rem; font-weight: 800;">{{ t('reseller_dashboard_title') }}</h1>
+                    <p style="color: var(--text-muted);">{{ t('welcome_reseller', user=session.reseller_username) }}</p>
+                </div>
+                <div class="glass" style="padding: 0.5rem 1rem; display: flex; align-items: center; gap: 1rem;">
+                    <div style="text-align: right;">
+                        <p style="font-size: 0.9rem; font-weight: 600;" id="liveClock">{{ now }}</p>
+                        <p style="font-size: 0.75rem; color: var(--text-muted);">
+                            <span class="badge {% if server.status == 'ON' %}badge-success{% else %}badge-danger{% endif %}">
+                                {{ server.status }}
+                            </span>
+                        </p>
+                    </div>
+                    <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #ec4899, #8b5cf6); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Search Bar -->
+            <div class="search-bar">
+                <form method="get" action="/reseller/dashboard" style="display: flex; gap: 0.5rem; width: 100%;">
+                    <input type="text" name="q" value="{{ search_q or '' }}" placeholder="{{ t('search') }}">
+                    <button type="submit" class="btn btn-primary" style="padding: 0.5rem 1.5rem; background: linear-gradient(135deg, #ec4899, #8b5cf6);"><i class="fas fa-search"></i></button>
+                    {% if search_q %}
+                    <a href="/reseller/dashboard" class="btn glass" style="padding: 0.5rem 1rem;">✕</a>
+                    {% endif %}
+                </form>
+            </div>
+
+            <div class="animate-fade">
+                <div class="card glass">
+                    <div class="card-title"><span></span>{{ t('server_status_label') }}</div>
+                    <div style="display: flex; align-items: center; gap: 2rem;">
+                        <div>
+                            <p style="font-size: 2.5rem; font-weight: 800; {% if server.status == 'ON' %}color: #10b981;{% else %}color: #ef4444;{% endif %}">
+                                <i class="fas {% if server.status == 'ON' %}fa-check-circle{% else %}fa-times-circle{% endif %}"></i>
+                                {{ server.status }}
+                            </p>
+                            {% if server.updated_at %}
+                            <p style="font-size: 0.8rem; color: var(--text-muted);">{{ t('last_updated', time=server.updated_at) }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                    <div class="glass" style="padding: 1.5rem; background: rgba(255,255,255,0.02);">
+                        <p style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">{{ t('total_license_keys') }}</p>
+                        <p style="font-size: 1.5rem; font-weight: 700;">{{ users|length if users else 0 }}</p>
+                    </div>
+                    <div class="glass" style="padding: 1.5rem; background: rgba(255,255,255,0.02);">
+                        <p style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">{{ t('current_date') }}</p>
+                        <p style="font-size: 1.2rem; font-weight: 700; font-family: 'JetBrains Mono';">{{ now[:10] }}</p>
+                    </div>
+                    <div class="glass" style="padding: 1.5rem; background: rgba(255,255,255,0.02);">
+                        <p style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">{{ t('current_time') }}</p>
+                        <p style="font-size: 1.2rem; font-weight: 700; font-family: 'JetBrains Mono';" id="liveTime">{{ now[11:] }}</p>
+                    </div>
+                </div>
+
+                <div class="card glass">
+                    <div class="card-title"><span></span>{{ t('license_keys_overview') }}</div>
+                    <div style="overflow-x: auto;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>{{ t('license_key_col') }}</th>
+                                    <th>{{ t('valid_until') }}</th>
+                                    <th>{{ t('status') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if users %}
+                                    {% for fid, user in users.items() %}
+                                    <tr>
+                                        <td>
+                                            <code style="font-family: 'JetBrains Mono'; font-weight: 700; color: var(--primary); background: rgba(99,102,241,0.1); padding: 4px 10px; border-radius: 6px;">{{ user.usuario }}</code>
+                                        </td>
+                                        <td>
+                                            <div style="display: flex; align-items: center; gap: 6px;">
+                                                <i class="fas fa-calendar-alt" style="color: var(--text-muted); font-size: 0.8rem;"></i>
+                                                <span>{{ user.expiracao }}</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% if user.status == '1' %}
+                                                <span class="badge badge-success">{{ t('active') }}</span>
+                                            {% else %}
+                                                <span class="badge badge-danger">BANNED</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="3" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                                            <i class="fas fa-database" style="font-size: 2rem; margin-bottom: 1rem; display: block; opacity: 0.2;"></i>
+                                            {{ t('no_licenses') }}
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function updateClock() {
+            var now = new Date();
+            var dateStr = now.getFullYear() + '-' +
+                String(now.getMonth()+1).padStart(2,'0') + '-' +
+                String(now.getDate()).padStart(2,'0');
+            var timeStr = String(now.getHours()).padStart(2,'0') + ':' +
+                String(now.getMinutes()).padStart(2,'0') + ':' +
+                String(now.getSeconds()).padStart(2,'0');
+            var fullStr = dateStr + ' ' + timeStr;
+            var el1 = document.getElementById('liveClock');
+            var el2 = document.getElementById('liveTime');
+            var el3 = document.getElementById('sidebarClock');
+            if (el1) el1.textContent = fullStr;
+            if (el2) el2.textContent = timeStr;
+            if (el3) el3.textContent = fullStr;
+        }
+        setInterval(updateClock, 1000);
+    </script>
+</body>
+</html>

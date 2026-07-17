@@ -1,0 +1,68 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ t('nav_generate_key') }} - {{ t('panel_name') }}{% endblock %}
+{% block page_title %}{{ t('page_title_generate_key') }}{% endblock %}
+{% block page_subtitle %}{{ t('page_subtitle_generate_key') }}{% endblock %}
+
+{% block content %}
+<div class="card glass animate-fade" style="max-width: 600px; margin: 0 auto;">
+    <div class="card-title"><span></span>{{ t('license_details') }}</div>
+    <form action="/add_user" method="post">
+        <div class="form-group" style="text-align: center;">
+            <label><i class="fas fa-key"></i> {{ t('auto_key') }}</label>
+            <div style="background: rgba(99, 102, 241, 0.1); border: 2px dashed var(--primary); border-radius: 12px; padding: 1.5rem; margin-top: 0.5rem;">
+                <i class="fas fa-shield-key" style="font-size: 2rem; color: var(--primary); margin-bottom: 0.5rem; display: block;"></i>
+                <p style="font-family: 'JetBrains Mono'; font-size: 1.4rem; font-weight: 700; color: var(--primary); letter-spacing: 2px;">SIZAN-XXXXXXXX</p>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem;">{{ t('key_auto_on_submit') }}</p>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+                <label><i class="fas fa-calendar-day"></i> {{ t('validity_days') }}</label>
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <button type="button" class="btn glass" style="padding: 5px 12px; font-size: 0.8rem;" onclick="setDays(1)">1D</button>
+                    <button type="button" class="btn glass" style="padding: 5px 12px; font-size: 0.8rem;" onclick="setDays(7)">7D</button>
+                    <button type="button" class="btn glass" style="padding: 5px 12px; font-size: 0.8rem;" onclick="setDays(30)">30D</button>
+                </div>
+                <input type="number" id="input_days" name="days" class="input-field" value="30" min="1">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-calendar-alt"></i> {{ t('custom_expiration') }}</label>
+                <input type="datetime-local" name="custom_expire" class="input-field">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label><i class="fas fa-code-branch"></i> {{ t('game_version') }}</label>
+            <select name="version" class="input-field">
+                <option value="v1">{{ t('standard_v1') }}</option>
+                <option value="v2">{{ t('premium_v2') }}</option>
+                <option value="x64">{{ t('x64_beta') }}</option>
+            </select>
+        </div>
+
+        <script>
+            function setDays(d) {
+                document.getElementById('input_days').value = d;
+                document.getElementsByName('custom_expire')[0].value = "";
+            }
+        </script>
+
+        <div class="form-group">
+            <label><i class="fas fa-shield-halved"></i> {{ t('access_level') }}</label>
+            <select name="type" class="input-field">
+                <option value="3">{{ t('subscriber') }}</option>
+                <option value="2">{{ t('reseller_tier') }}</option>
+                <option value="1">{{ t('master_admin_tier') }}</option>
+            </select>
+        </div>
+
+        <div style="margin-top: 2rem;">
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                <i class="fas fa-cloud-upload-alt"></i> {{ t('create_sync') }}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

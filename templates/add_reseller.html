@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ t('nav_add_reseller') }} - {{ t('panel_name') }}{% endblock %}
+{% block page_title %}{{ t('page_title_add_reseller') }}{% endblock %}
+{% block page_subtitle %}{{ t('page_subtitle_add_reseller') }}{% endblock %}
+
+{% block content %}
+<div class="card glass animate-fade" style="max-width: 500px; margin: 0 auto;">
+    <div class="card-title"><span></span>{{ t('reseller_account_details') }}</div>
+    <form action="/add_reseller" method="post">
+        <div class="form-group">
+            <label><i class="fas fa-user-tag"></i> {{ t('reseller_username_label') }}</label>
+            <input type="text" name="username" class="input-field" placeholder="{{ t('reseller_username_label') }}" required>
+        </div>
+
+        <div class="form-group">
+            <label><i class="fas fa-lock"></i> {{ t('reseller_password_label') }}</label>
+            <input type="text" name="password" class="input-field" placeholder="{{ t('reseller_password_label') }}" required>
+            <p style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.3rem;">{{ t('reseller_cred_note') }}</p>
+        </div>
+
+        {% if error %}
+        <div style="color: #ff4b2b; background: rgba(255, 75, 43, 0.1); padding: 10px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 1rem;">
+            <i class="fas fa-exclamation-circle"></i> {{ error }}
+        </div>
+        {% endif %}
+
+        <div style="margin-top: 2rem;">
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                <i class="fas fa-user-plus"></i> {{ t('create_reseller_btn') }}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

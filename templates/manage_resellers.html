@@ -1,0 +1,121 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ t('nav_resellers') }} - {{ t('panel_name') }}{% endblock %}
+{% block page_title %}{{ t('manage_resellers_title') }}{% endblock %}
+{% block page_subtitle %}{{ t('manage_resellers_subtitle') }}{% endblock %}
+
+{% block content %}
+<div class="card glass animate-fade" style="max-width: 600px;">
+    <div class="card-title">
+        <span></span>
+        {{ t('manage_resellers_create') }}
+    </div>
+
+    {% if message %}
+    <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; padding: 1rem; border-radius: 10px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fas fa-check-circle"></i> <span>{{ message }}</span>
+    </div>
+    {% endif %}
+
+    {% if error %}
+    <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; padding: 1rem; border-radius: 10px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fas fa-exclamation-circle"></i> <span>{{ error }}</span>
+    </div>
+    {% endif %}
+
+    <form action="/manage_resellers" method="post">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+                <label><i class="fas fa-user"></i> {{ t('manage_resellers_username') }}</label>
+                <input type="text" name="username" class="input-field" placeholder="{{ t('manage_resellers_username') }}" required>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-lock"></i> {{ t('manage_resellers_password') }}</label>
+                <input type="password" name="password" class="input-field" placeholder="{{ t('manage_resellers_password') }}" required>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+                <label><i class="fas fa-calendar-day"></i> {{ t('add_user_validity_days') }}</label>
+                <input type="number" name="days" class="input-field" value="0" min="0">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-clock"></i> {{ t('add_user_valid_time') }}</label>
+                <input type="number" name="hours" class="input-field" value="0" min="0" max="23">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label><i class="fas fa-calendar-alt"></i> {{ t('add_user_custom_expire') }}</label>
+            <input type="datetime-local" name="custom_expire" class="input-field">
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-plus"></i> {{ t('manage_resellers_create_btn') }}
+        </button>
+    </form>
+</div>
+
+<div class="card glass animate-fade">
+    <div class="card-title">
+        <span></span>
+        {{ t('manage_resellers_registered') }}
+    </div>
+    <div style="overflow-x: auto;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>{{ t('manage_resellers_username') }}</th>
+                    <th>{{ t('manage_resellers_registered_date') }}</th>
+                    <th>{{ t('users_list_valid_until') }}</th>
+                    <th>{{ t('manage_resellers_status') }}</th>
+                    <th style="text-align: right;">{{ t('manage_resellers_actions') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if resellers %}
+                    {% for rid, reseller in resellers.items() %}
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="width: 32px; height: 32px; background: rgba(168, 85, 247, 0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--secondary);">
+                                    <i class="fas fa-store"></i>
+                                </div>
+                                <strong>{{ reseller.username }}</strong>
+                            </div>
+                        </td>
+                        <td style="font-size: 0.9rem;">{{ reseller.created_at }}</td>
+                        <td style="font-size: 0.9rem;">{{ reseller.expiracao if reseller.expiracao and reseller.expiracao != 'Never' else t('never') }}</td>
+                        <td>
+                            {% if reseller.status == '1' %}
+                                <span class="badge badge-success">{{ t('badge_active') }}</span>
+                            {% else %}
+                                <span class="badge badge-danger">{{ t('badge_banned') }}</span>
+                            {% endif %}
+                        </td>
+                        <td style="text-align: right;">
+                            <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                                <a href="/toggle_reseller/{{ rid }}" class="btn glass" style="padding: 0.5rem; width: 36px; height: 36px; justify-content: center;" title="{{ t('manage_resellers_status') }}">
+                                    <i class="fas {{ 'fa-ban' if reseller.status == '1' else 'fa-check' }}"></i>
+                                </a>
+                                <a href="/delete_reseller/{{ rid }}" class="btn btn-danger" style="padding: 0.5rem; width: 36px; height: 36px; justify-content: center;" title="{{ t('manage_resellers_actions') }}" onclick="return confirm('{{ t('confirm_delete_reseller') }}')">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                            <i class="fas fa-store" style="font-size: 2rem; margin-bottom: 1rem; display: block; opacity: 0.2;"></i>
+                            {{ t('manage_resellers_empty') }}
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

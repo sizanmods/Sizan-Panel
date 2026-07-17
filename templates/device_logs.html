@@ -1,0 +1,128 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ t('nav_device_logs') }} - {{ t('panel_name') }}{% endblock %}
+{% block page_title %}{{ t('device_logs_title') }}{% endblock %}
+{% block page_subtitle %}{{ t('device_logs_subtitle') }}{% endblock %}
+
+{% block content %}
+<div class="card glass animate-fade" style="margin-bottom: 2rem; display: flex; flex-direction: row; justify-content: space-between; align-items: center; wrap: wrap; gap: 1rem;">
+    <div style="flex: 1; min-width: 250px;">
+        <div class="form-group" style="margin-bottom: 0;">
+            <input type="text" id="logSearch" class="input-field" placeholder="{{ t('device_logs_search') }}" onkeyup="filterLogs()">
+        </div>
+    </div>
+    <div>
+        <a href="/device_logs/clear" class="btn btn-danger" onclick="return confirm('{{ t('confirm_clear_logs') }}')">
+            <i class="fas fa-trash-can"></i> {{ t('device_logs_clear') }}
+        </a>
+    </div>
+</div>
+
+<div class="card glass animate-fade">
+    <div class="card-title">
+        <span></span>
+        {{ t('device_logs_history') }}
+    </div>
+    
+    <div style="overflow-x: auto;">
+        <table class="data-table" id="logsTable">
+            <thead>
+                <tr>
+                    <th>{{ t('device_logs_timestamp') }}</th>
+                    <th>{{ t('device_logs_username') }}</th>
+                    <th>{{ t('device_logs_device') }}</th>
+                    <th>{{ t('device_logs_uid') }}</th>
+                    <th>{{ t('device_logs_ip') }}</th>
+                    <th>{{ t('device_logs_status') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if logs %}
+                    {% for log in logs %}
+                    <tr class="log-row">
+                        <td style="font-size: 0.9rem; white-space: nowrap;">
+                            {{ log.timestamp }}
+                        </td>
+                        <td>
+                            <strong style="color: var(--primary);">{{ log.username }}</strong>
+                        </td>
+                        <td style="font-size: 0.9rem; font-weight: 500;">
+                            {% if "Android" in log.phone_info or "iPhone" in log.phone_info or "iPad" in log.phone_info %}
+                                <i class="fas fa-mobile-alt" style="color: var(--secondary); margin-right: 5px;"></i>
+                            {% else %}
+                                <i class="fas fa-desktop" style="color: var(--text-muted); margin-right: 5px;"></i>
+                            {% endif %}
+                            {{ log.phone_info }}
+                        </td>
+                        <td>
+                            <code style="font-family: 'JetBrains Mono'; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; color: #a855f7;">
+                                {{ log.device_uid }}
+                            </code>
+                        </td>
+                        <td style="font-family: 'JetBrains Mono'; font-size: 0.9rem;">
+                            {{ log.ip }}
+                        </td>
+                        <td>
+                            {% if "SUCCESS" in log.status %}
+                                <span class="badge badge-success" style="font-size: 0.75rem;">{{ log.status }}</span>
+                            {% else %}
+                                <span class="badge badge-danger" style="font-size: 0.75rem;" title="{{ log.status }}">{{ log.status }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 4rem; color: var(--text-muted);">
+                            <i class="fas fa-clock" style="font-size: 2.5rem; margin-bottom: 1rem; display: block; opacity: 0.2;"></i>
+                            {{ t('device_logs_empty') }}
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div style="text-align: center; margin-top: 1rem;">
+    <p style="color: var(--text-muted); font-size: 0.8rem;" id="logsCount">
+        {{ t('footer_showing') }} {{ logs|length if logs else 0 }} {{ t('footer_logs_total') }}
+    </p>
+</div>
+
+<script>
+    function filterLogs() {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("logSearch");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("logsTable");
+        tr = table.getElementsByClassName("log-row");
+        var visibleCount = 0;
+        
+        for (i = 0; i < tr.length; i++) {
+            var rowMatch = false;
+            var cells = [tr[i].getElementsByTagName("td")[1], tr[i].getElementsByTagName("td")[2], tr[i].getElementsByTagName("td")[3], tr[i].getElementsByTagName("td")[4]];
+            
+            for (var j = 0; j < cells.length; j++) {
+                td = cells[j];
+                if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        rowMatch = true;
+                        break;
+                    }
+                }
+            }
+            
+            if (rowMatch) {
+                tr[i].style.display = "";
+                visibleCount++;
+            } else {
+                tr[i].style.display = "none";
+            }
+        }
+        
+        document.getElementById("logsCount").textContent = "{{ t('footer_showing') }} " + visibleCount + " of " + tr.length + " {{ t('footer_logs_total') }}";
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="{{ current_lang }}">
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}{{ t('reseller_panel') }}{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/logo.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar glass">
+            <div class="logo">
+                <i class="fas fa-store"></i>
+                <span>{{ t('reseller_panel') }}</span>
+            </div>
+            
+            <nav class="nav-links">
+                <a href="/reseller_dashboard" class="nav-item {% if request.path == '/reseller_dashboard' %}active{% endif %}">
+                    <i class="fas fa-chart-line"></i>
+                    <span>{{ t('nav_dashboard') }}</span>
+                </a>
+                <a href="/reseller_add_user" class="nav-item {% if request.path == '/reseller_add_user' %}active{% endif %}">
+                    <i class="fas fa-user-plus"></i>
+                    <span>{{ t('nav_create_license') }}</span>
+                </a>
+            </nav>
+
+            <div style="margin-top: auto;">
+                <hr style="opacity: 0.1; margin-bottom: 1.5rem;">
+                <div style="padding: 0.5rem 1.2rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    {% for code in lang_codes %}
+                    <a href="/set_lang/{{ code }}" class="btn glass" style="padding: 3px 8px; font-size: 0.7rem; {% if code == current_lang %}border-color: var(--primary); color: var(--primary);{% endif %}">
+                        {{ LANG_NAMES[code] if LANG_NAMES[code] is defined else code }}
+                    </a>
+                    {% endfor %}
+                </div>
+                <div style="padding: 0.5rem 1.2rem; font-size: 0.8rem; color: var(--text-muted);">
+                    <i class="fas fa-user"></i> {{ session.reseller_user }}
+                </div>
+                <a href="/reseller_logout" class="nav-item" style="color: #ef4444;">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>{{ t('nav_logout') }}</span>
+                </a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header style="margin-bottom: 2.5rem; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1 style="font-size: 2rem; font-weight: 800;">{% block page_title %}{{ t('nav_dashboard') }}{% endblock %}</h1>
+                    <p style="color: var(--text-muted);">{% block page_subtitle %}{{ t('reseller_dashboard_subtitle') }}{% endblock %}</p>
+                </div>
+            </header>
+
+            <div class="animate-fade">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+</body>
+</html>

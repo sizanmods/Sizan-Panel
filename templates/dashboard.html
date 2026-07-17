@@ -1,0 +1,122 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ t('nav_dashboard') }} - {{ t('panel_name') }}{% endblock %}
+{% block page_title %}{{ t('nav_dashboard') }}{% endblock %}
+
+{% block content %}
+<div class="card glass">
+    <div class="card-title"><span></span>{{ t('system_status') }}</div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+        <div class="glass" style="padding: 1.5rem; background: rgba(255,255,255,0.02);">
+            <p style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">{{ t('realtime_db') }}</p>
+            <p style="font-size: 1.5rem; font-weight: 700; color: #10b981;">{{ t('online') }}</p>
+        </div>
+        <div class="glass" style="padding: 1.5rem; background: rgba(255,255,255,0.02);">
+            <p style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">{{ t('rsa_encryption') }}</p>
+            <p style="font-size: 1.5rem; font-weight: 700;">{{ t('active') }}</p>
+        </div>
+        <div class="glass" style="padding: 1.5rem; background: rgba(255,255,255,0.02);">
+            <p style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">{{ t('server_load') }}</p>
+            <p style="font-size: 1.5rem; font-weight: 700;">{{ t('normal') }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="card glass">
+    <div class="card-title"><span></span>{{ t('server_control') }}</div>
+    <div style="display: flex; align-items: center; gap: 2rem; flex-wrap: wrap;">
+        <div style="flex: 1;">
+            <p style="color: var(--text-muted); margin-bottom: 0.5rem;">{{ t('server_status_label') }}</p>
+            <p style="font-size: 2rem; font-weight: 800; {% if server.status == 'ON' %}color: #10b981;{% else %}color: #ef4444;{% endif %}" id="serverStatusText">
+                {{ server.status }}
+            </p>
+            {% if server.updated_at %}
+            <p style="font-size: 0.8rem; color: var(--text-muted);">{{ t('last_updated', time=server.updated_at) }}</p>
+            {% endif %}
+        </div>
+        <div>
+            <form action="/server_toggle" method="post">
+                {% if server.status == 'ON' %}
+                <button type="submit" name="status" value="OFF" class="btn btn-danger" style="font-size: 1.1rem; padding: 1rem 2rem;">
+                    <i class="fas fa-power-off"></i> {{ t('turn_off_server') }}
+                </button>
+                {% else %}
+                <button type="submit" name="status" value="ON" class="btn btn-primary" style="font-size: 1.1rem; padding: 1rem 2rem;">
+                    <i class="fas fa-power-off"></i> {{ t('turn_on_server') }}
+                </button>
+                {% endif %}
+            </form>
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">{{ t('server_off_notice') }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="card glass">
+    <div class="card-title"><span></span>{{ t('admin_profile') }}</div>
+    <div class="data-table-container" style="overflow-x: auto;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>{{ t('admin_user') }}</th>
+                    <th>{{ t('status') }}</th>
+                    <th>{{ t('permissions') }}</th>
+                    <th>{{ t('security_binding') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 32px; height: 32px; background: rgba(99, 102, 241, 0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--primary);">
+                                <i class="fas fa-terminal"></i>
+                            </div>
+                            <strong>{{ user.usuario }}</strong>
+                        </div>
+                    </td>
+                    <td><span class="badge badge-success">{{ t('active') }}</span></td>
+                    <td>{{ t('master_admin') if user.tipo == '1' else t('reseller') }}</td>
+                    <td><code style="font-family: 'JetBrains Mono'; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px;">{{ user.UID }}</code></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+    <div class="card glass">
+        <div class="card-title"><span></span>{{ t('quick_actions') }}</div>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <a href="/add_user" class="btn btn-primary">
+                <i class="fas fa-plus"></i> {{ t('new_key') }}
+            </a>
+            <a href="/users_list" class="btn glass">
+                <i class="fas fa-list"></i> {{ t('view_keys') }}
+            </a>
+            <a href="/add_reseller" class="btn glass">
+                <i class="fas fa-handshake"></i> {{ t('add_reseller_btn') }}
+            </a>
+        </div>
+    </div>
+
+    <div class="card glass">
+        <div class="card-title"><span></span>{{ t('current_date_time') }}</div>
+        <p style="font-size: 1.5rem; font-weight: 700; font-family: 'JetBrains Mono';" id="liveClock">{{ now }}</p>
+        <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">{{ t('timezone_info') }}</p>
+    </div>
+</div>
+
+<script>
+    function updateClock() {
+        var now = new Date();
+        var dateStr = now.getFullYear() + '-' +
+            String(now.getMonth()+1).padStart(2,'0') + '-' +
+            String(now.getDate()).padStart(2,'0') + ' ' +
+            String(now.getHours()).padStart(2,'0') + ':' +
+            String(now.getMinutes()).padStart(2,'0') + ':' +
+            String(now.getSeconds()).padStart(2,'0');
+        var el = document.getElementById('liveClock');
+        if (el) el.textContent = dateStr;
+    }
+    setInterval(updateClock, 1000);
+</script>
+{% endblock %}

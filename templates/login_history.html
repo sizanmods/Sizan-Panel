@@ -1,0 +1,79 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ t('page_title_history') }} - {{ t('panel_name') }}{% endblock %}
+{% block page_title %}{{ t('page_title_history') }}{% endblock %}
+{% block page_subtitle %}{{ t('page_subtitle_history', key=user.usuario if user else 'N/A') }}{% endblock %}
+
+{% block search_bar %}
+<div class="search-bar" style="margin-bottom: 1.5rem;">
+    <form method="get" action="/login_history/{{ fid }}" style="display: flex; gap: 0.5rem; width: 100%;">
+        <input type="text" name="q" value="{{ search_q or '' }}" placeholder="{{ t('search') }}" style="flex: 1;">
+        <button type="submit" class="btn btn-primary" style="padding: 0.5rem 1.5rem;"><i class="fas fa-search"></i></button>
+        {% if search_q %}
+        <a href="/login_history/{{ fid }}" class="btn glass" style="padding: 0.5rem 1rem;">✕</a>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="card glass animate-fade">
+    <div class="card-title">
+        <span></span>{{ t('login_records') }}
+        <div style="margin-left: auto; display: flex; gap: 0.5rem;">
+            <a href="/users_list" class="btn glass" style="padding: 0.4rem 1rem; font-size: 0.85rem;">
+                <i class="fas fa-arrow-left"></i> {{ t('back') }}
+            </a>
+            <a href="/clear_history/{{ fid }}" class="btn btn-danger" style="padding: 0.4rem 1rem; font-size: 0.85rem;" onclick="return confirm('{{ t('confirm_delete') }}')">
+                <i class="fas fa-trash"></i> {{ t('clear_all') }}
+            </a>
+        </div>
+    </div>
+    <div style="overflow-x: auto;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>{{ t('device_uid_col') }}</th>
+                    <th>{{ t('ip_address') }}</th>
+                    <th>{{ t('login_time') }}</th>
+                    <th style="text-align: right;">{{ t('action') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if history %}
+                    {% set count = namespace(value=1) %}
+                    {% for hid, entry in history.items()|sort(attribute='1.time', reverse=True) %}
+                    <tr>
+                        <td>{{ count.value }}</td>
+                        <td>
+                            <code style="font-family: 'JetBrains Mono'; font-size: 0.85rem; background: rgba(0,0,0,0.2); padding: 2px 6px; border-radius: 4px;">{{ entry.uid }}</code>
+                        </td>
+                        <td>{{ entry.ip }}</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <i class="fas fa-clock" style="color: var(--text-muted); font-size: 0.8rem;"></i>
+                                <span>{{ entry.time }}</span>
+                            </div>
+                        </td>
+                        <td style="text-align: right;">
+                            <a href="/delete_history/{{ fid }}/{{ hid }}" class="btn glass" style="padding: 0.3rem; width: 30px; height: 30px; justify-content: center; color: #ef4444;" title="{{ t('delete_entry_confirm') }}" onclick="return confirm('{{ t('delete_entry_confirm') }}')">
+                                <i class="fas fa-times"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% set count.value = count.value + 1 %}
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                            <i class="fas fa-history" style="font-size: 2rem; margin-bottom: 1rem; display: block; opacity: 0.2;"></i>
+                            {{ t('no_history') }}
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

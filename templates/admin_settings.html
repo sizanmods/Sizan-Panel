@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ t('nav_admin_settings') }} - {{ t('panel_name') }}{% endblock %}
+{% block page_title %}{{ t('admin_settings_title') }}{% endblock %}
+{% block page_subtitle %}{{ t('admin_settings_subtitle') }}{% endblock %}
+
+{% block content %}
+<div class="card glass animate-fade" style="max-width: 600px; margin: 0 auto;">
+    <div class="card-title">
+        <span></span>
+        {{ t('admin_settings_key_config') }}
+    </div>
+    
+    {% if message %}
+    <div class="alert alert-success animate-fade" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; padding: 1rem; border-radius: 10px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fas fa-check-circle"></i>
+        <span>{{ message }}</span>
+    </div>
+    {% endif %}
+    
+    {% if error %}
+    <div class="alert alert-danger animate-fade" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; padding: 1rem; border-radius: 10px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fas fa-exclamation-circle"></i>
+        <span>{{ error }}</span>
+    </div>
+    {% endif %}
+
+    <form action="/admin_settings" method="post">
+        <div class="form-group">
+            <label for="key"><i class="fas fa-key"></i> {{ t('admin_settings_admin_key') }}</label>
+            <input type="password" id="key" name="key" class="input-field" placeholder="{{ t('admin_settings_admin_key') }}" value="{{ admin.admin_key }}" required>
+            <div style="margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--text-muted);">
+                <input type="checkbox" id="show_key" onclick="toggleKeyVisibility()" style="cursor: pointer;">
+                <label for="show_key" style="margin: 0; cursor: pointer; display: inline;">{{ t('admin_settings_show_key') }}</label>
+            </div>
+        </div>
+
+        <div style="margin-top: 2.5rem;">
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                <i class="fas fa-save"></i> {{ t('admin_settings_update_btn') }}
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function toggleKeyVisibility() {
+        var x = document.getElementById("key");
+        if (x.type === "password") {
+            x.type = "text";
+        } else {
+            x.type = "password";
+        }
+    }
+</script>
+{% endblock %}

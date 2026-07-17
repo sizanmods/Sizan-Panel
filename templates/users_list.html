@@ -1,0 +1,84 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ t('nav_manage_keys') }} - {{ t('panel_name') }}{% endblock %}
+{% block page_title %}{{ t('page_title_manage_keys') }}{% endblock %}
+{% block page_subtitle %}{{ t('page_subtitle_manage_keys') }}{% endblock %}
+
+{% block search_bar %}
+<div class="search-bar" style="margin-bottom: 1.5rem;">
+    <form method="get" action="/users_list" style="display: flex; gap: 0.5rem; width: 100%;">
+        <input type="text" name="q" value="{{ search_q or '' }}" placeholder="{{ t('search') }}" style="flex: 1;">
+        <button type="submit" class="btn btn-primary" style="padding: 0.5rem 1.5rem;"><i class="fas fa-search"></i></button>
+        {% if search_q %}
+        <a href="/users_list" class="btn glass" style="padding: 0.5rem 1rem;">✕</a>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="card glass animate-fade">
+    <div class="card-title"><span></span>{{ t('active_licenses') }}</div>
+    <div style="overflow-x: auto;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>{{ t('license_key_col') }}</th>
+                    <th>{{ t('valid_until') }}</th>
+                    <th>{{ t('hardware_id') }}</th>
+                    <th>{{ t('status') }}</th>
+                    <th style="text-align: right;">{{ t('operations') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if users %}
+                    {% for fid, user in users.items() %}
+                    <tr>
+                        <td>
+                            <code style="font-family: 'JetBrains Mono'; font-weight: 700; color: var(--primary); font-size: 1rem; background: rgba(99,102,241,0.1); padding: 4px 10px; border-radius: 6px;">{{ user.usuario }}</code>
+                        </td>
+                        <td><div style="font-size: 0.9rem;">{{ user.expiracao }}</div></td>
+                        <td>
+                            <code style="font-family: 'JetBrains Mono'; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; color: var(--secondary);">
+                                {{ user.UID if user.UID != '000000000000000' else t('unlinked') }}
+                            </code>
+                        </td>
+                        <td>
+                            {% if user.status == '1' %}
+                                <span class="badge badge-success">{{ t('active') }}</span>
+                            {% else %}
+                                <span class="badge badge-danger">BANNED</span>
+                            {% endif %}
+                        </td>
+                        <td style="text-align: right;">
+                            <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                                <a href="/login_history/{{ fid }}" class="btn glass" style="padding: 0.5rem; width: 36px; height: 36px; justify-content: center;" title="{{ t('view_history') }}">
+                                    <i class="fas fa-history"></i>
+                                </a>
+                                <a href="/reset_device/{{ fid }}" class="btn glass" style="padding: 0.5rem; width: 36px; height: 36px; justify-content: center;" title="{{ t('reset_device') }}">
+                                    <i class="fas fa-microchip"></i>
+                                </a>
+                                <a href="/delete_user/{{ fid }}" class="btn btn-danger" style="padding: 0.5rem; width: 36px; height: 36px; justify-content: center;" title="{{ t('terminate_license') }}" onclick="return confirm('{{ t('confirm_delete') }}')">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                            <i class="fas fa-database" style="font-size: 2rem; margin-bottom: 1rem; display: block; opacity: 0.2;"></i>
+                            {{ t('no_licenses') }}
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div style="text-align: center; margin-top: 1rem;">
+    <p style="color: var(--text-muted); font-size: 0.8rem;">{{ t('total_count', count=users|length if users else 0) }}</p>
+</div>
+{% endblock %}
