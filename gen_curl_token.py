@@ -52,7 +52,7 @@ if __name__ == "__main__":
     token = generate_curl_token(user, pw)
     ua = "BADOFTRUE/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T)/537.36 (KHTML, like Bad)"
     
-    print(f'curl -X POST "https://sizan-panel-tau.vercel.app/api/login" \\')
+    print(f'curl -X POST "https://sizan-panel-theta.vercel.app/api/login" \\')
     print(f'     -H "User-Agent: {ua}" \\')
     print(f'     -H "Content-Type: application/x-www-form-urlencoded" \\')
     print(f'     --data-urlencode "token={token}"')
